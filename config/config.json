@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "96Degrees!",
+    "database": "erp_system",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "96Degrees!",
+    "database": "erp_system_test",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "96Degrees!",
+    "database": "erp_system_prod",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
