@@ -1,4 +1,6 @@
 require('dotenv').config();
+require("./services/exchangeRateCleanup"); // Start automated cleanup
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -6,8 +8,19 @@ const { sequelize } = require('./models');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const entityRoutes = require('./routes/entityRoutes');
+const currencyRoutes = require("./routes/currencyRoutes");
+const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
+const fetchAndStoreExchangeRates = require("./utils/fetchExchangeRates");
+const cron = require("node-cron");
+const glAccountRoutes = require("./routes/glAccountRoutes"); // ✅ Import GL Account routes
 
 const app = express();
+
+// Schedule exchange rate updates every 12 hours
+cron.schedule("0 */12 * * *", async () => {
+    console.log("⏳ Running scheduled exchange rate update...");
+    await fetchAndStoreExchangeRates();
+});
 
 // Middleware
 app.use(cors());
@@ -18,6 +31,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/entities', entityRoutes);
+app.use("/api/currencies", currencyRoutes);
+app.use("/api/exchange-rates", exchangeRateRoutes);
+app.use("/api/gl-accounts", glAccountRoutes); // ✅ Register the route
 
 // Home Route
 app.get('/', (req, res) => {

@@ -1,42 +1,37 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const { Sequelize, DataTypes } = require('sequelize');
-const process = require('process');
+const path = require('path');
+const fs = require('fs');
 
-const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const config = require("../config/config.json")[env];
+
+const sequelize = config.use_env_variable
+  ? new Sequelize(process.env[config.use_env_variable], config)
+  : new Sequelize(config.database, config.username, config.password, config);
 
 const db = {};
 
-// Initialize Sequelize
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
+// ✅ Explicitly Import Models
+db.Currency = require("./currency")(sequelize, DataTypes);
+db.ExchangeRate = require("./exchangeRate")(sequelize, DataTypes);
+db.GL_Account = require("./glAccount")(sequelize, DataTypes);
+db.Entity = require("./entity")(sequelize, DataTypes);
 
-// Read model files dynamically and initialize them
-fs.readdirSync(__dirname)
-  .filter(file => {
-    return file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js';
-  })
-  .forEach(file => {
-    const modelDef = require(path.join(__dirname, file)); // Import model function
-    const model = modelDef(sequelize, DataTypes); // Initialize the model
-    db[model.name] = model;
-  });
+// ✅ Define Associations (Foreign Keys)
 
-// Apply associations if they exist
-Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
+// 📌 Currency & Exchange Rates
+db.Currency.hasMany(db.ExchangeRate, { foreignKey: "base_currency", as: "BaseCurrencyRates" });
+db.Currency.hasMany(db.ExchangeRate, { foreignKey: "target_currency", as: "TargetCurrencyRates" });
+db.ExchangeRate.belongsTo(db.Currency, { foreignKey: "base_currency", as: "BaseCurrency" });
+db.ExchangeRate.belongsTo(db.Currency, { foreignKey: "target_currency", as: "TargetCurrency" });
 
+// 📌 General Ledger (GL) Accounts
+db.GL_Account.belongsTo(db.Currency, { foreignKey: "currency", targetKey: "currency_code", as: "CurrencyDetails" });
+db.GL_Account.belongsTo(db.Entity, { foreignKey: "entity_id", targetKey: "entity_id", as: "EntityDetails" });
+
+// ✅ Assign Sequelize & Export DB
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

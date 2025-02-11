@@ -1,5 +1,5 @@
 const express = require('express');
-const Entity = require('../models/entity'); // ✅ Ensure correct import
+const { Entity } = require('../models'); // ✅ Ensure correct import
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
