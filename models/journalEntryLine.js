@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const JournalLine = sequelize.define("JournalLine", {
+    const JournalEntryLine = sequelize.define("JournalEntryLine", {
       line_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     });
   
-    return JournalLine;
+    return JournalEntryLine;
   };
 
   

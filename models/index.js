@@ -25,6 +25,10 @@ db.CustomerInvoice = require("./customerInvoice")(sequelize, DataTypes);
 db.CustomerInvoiceLine = require("./customerInvoiceLine")(sequelize, DataTypes);
 db.JournalEntry = require("./journalEntry")(sequelize, DataTypes);
 db.JournalEntryLine = require("./journalEntryLine")(sequelize, DataTypes); // ✅ Renamed from JournalLine.js
+db.PurchaseOrder = require("./purchaseOrder")(sequelize, DataTypes);
+db.PurchaseOrderLine = require("./purchaseOrderLine")(sequelize, DataTypes);
+db.SalesOrder = require("./salesOrder")(sequelize, DataTypes);
+db.SalesOrderLine = require("./salesOrderLine")(sequelize, DataTypes);
 
 // ✅ Define Associations
 
@@ -57,6 +61,18 @@ db.CustomerInvoice.hasMany(db.CustomerInvoiceLine, { foreignKey: "invoice_id", o
 db.CustomerInvoiceLine.belongsTo(db.CustomerInvoice, { foreignKey: "invoice_id" });
 db.CustomerInvoiceLine.belongsTo(db.Entity, { foreignKey: "entity_id" });
 db.CustomerInvoiceLine.belongsTo(db.GL_Account, { foreignKey: "revenue_account_id" });
+
+// ✅ Purchase Orders
+db.PurchaseOrder.belongsTo(db.Vendor, { foreignKey: "vendor_id" });
+db.PurchaseOrder.belongsTo(db.Entity, { foreignKey: "entity_id" });
+db.PurchaseOrder.hasMany(db.PurchaseOrderLine, { foreignKey: "po_id" });
+db.PurchaseOrderLine.belongsTo(db.PurchaseOrder, { foreignKey: "po_id" });
+
+// ✅ Sales Orders
+db.SalesOrder.belongsTo(db.Customer, { foreignKey: "customer_id" });
+db.SalesOrder.belongsTo(db.Entity, { foreignKey: "entity_id" });
+db.SalesOrder.hasMany(db.SalesOrderLine, { foreignKey: "so_id" });
+db.SalesOrderLine.belongsTo(db.SalesOrder, { foreignKey: "so_id" });
 
 // 🎯 **Journal Entry & Journal Entry Line Associations**
 db.JournalEntry.belongsTo(db.Entity, { foreignKey: "entity_id" });

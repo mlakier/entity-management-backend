@@ -49,11 +49,15 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DECIMAL(18,2),
             allowNull: false,
         },
+        tax_id: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         status: {
             type: DataTypes.ENUM("Draft", "Approved", "Paid", "Overdue"),
             defaultValue: "Draft",
         },
-        created_by: {
+                created_by: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },

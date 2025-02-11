@@ -22,6 +22,10 @@ const vendorBillLineRoutes = require("./routes/vendorBillLineRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const customerInvoiceRoutes = require("./routes/customerInvoiceRoutes");
 const customerInvoiceLineRoutes = require("./routes/customerInvoiceLineRoutes");
+const purchaseOrderRoutes = require("./routes/purchaseOrderRoutes");
+const purchaseOrderLineRoutes = require("./routes/purchaseOrderLineRoutes");
+const salesOrderRoutes = require("./routes/salesOrderRoutes");
+const salesOrderLineRoutes = require("./routes/salesOrderLineRoutes");
 
 const app = express();
 
@@ -51,6 +55,10 @@ app.use("/api/vendor-bill-lines", vendorBillLineRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/customer-invoices", customerInvoiceRoutes);
 app.use("/api/customer-invoices-lines", customerInvoiceLineRoutes);
+app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/purchase-order-lines", purchaseOrderLineRoutes);
+app.use("/api/sales-orders", salesOrderRoutes);
+app.use("/api/sales-order-lines", salesOrderLineRoutes);
 
 // Home Route
 app.get('/', (req, res) => {
