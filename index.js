@@ -1,6 +1,7 @@
 require('dotenv').config();
 require("./services/exchangeRateCleanup"); // Start automated cleanup
 
+// Import Routes
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -12,7 +13,15 @@ const currencyRoutes = require("./routes/currencyRoutes");
 const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
 const fetchAndStoreExchangeRates = require("./utils/fetchExchangeRates");
 const cron = require("node-cron");
-const glAccountRoutes = require("./routes/glAccountRoutes"); // ✅ Import GL Account routes
+const glAccountRoutes = require("./routes/glAccountRoutes");
+const journalEntryRoutes = require("./routes/journalEntryRoutes");
+const journalEntryLineRoutes = require("./routes/journalEntryLineRoutes");
+const vendorRoutes = require("./routes/vendorRoutes");
+const vendorBillRoutes = require("./routes/vendorBillRoutes");
+const vendorBillLineRoutes = require("./routes/vendorBillLineRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const customerInvoiceRoutes = require("./routes/customerInvoiceRoutes");
+const customerInvoiceLineRoutes = require("./routes/customerInvoiceLineRoutes");
 
 const app = express();
 
@@ -27,13 +36,21 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Routes
+// Register Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/entities', entityRoutes);
 app.use("/api/currencies", currencyRoutes);
 app.use("/api/exchange-rates", exchangeRateRoutes);
-app.use("/api/gl-accounts", glAccountRoutes); // ✅ Register the route
+app.use("/api/gl-accounts", glAccountRoutes);
+app.use("/api/journal-entries", journalEntryRoutes);
+app.use("/api/journal-entries-lines", journalEntryLineRoutes);
+app.use("/api/vendors", vendorRoutes);
+app.use("/api/vendor-bills", vendorBillRoutes);
+app.use("/api/vendor-bill-lines", vendorBillLineRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/customer-invoices", customerInvoiceRoutes);
+app.use("/api/customer-invoices-lines", customerInvoiceLineRoutes);
 
 // Home Route
 app.get('/', (req, res) => {
