@@ -65,6 +65,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+    }, {
+        tableName: "Journal_Entry",
+        timestamps: true,
     });
   
     return JournalEntry;

@@ -8,13 +8,23 @@ module.exports = (sequelize, DataTypes) => {
         customer_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: "Customer", key: "customer_id" }
-        },
-        entity_id: {
+            references: {
+              model: "Customers",  // ✅ Ensure this matches the correct table name
+              key: "customer_id",
+            },
+            onDelete: "NO ACTION",
+            onUpdate: "CASCADE",
+          },
+          entity_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: "Entity", key: "entity_id" }
-        },
+            references: {
+              model: "Entities",  // ✅ Ensure this matches the correct table name
+              key: "entity_id",
+            },
+            onDelete: "NO ACTION",
+            onUpdate: "CASCADE",
+          },
         so_date: {
             type: DataTypes.DATEONLY,
             allowNull: false

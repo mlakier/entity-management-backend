@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
-    }, {
+    }, 
+    {
       tableName: "Currency",
       timestamps: false,
     });

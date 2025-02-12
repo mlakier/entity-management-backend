@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "JournalEntry",
+          model: "Journal_Entry",
           key: "entry_id",
         },
       },
@@ -57,7 +57,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-    });
+    }, {
+      tableName: "Journal_Entry_Line",
+      timestamps: true,
+  });
   
     return JournalEntryLine;
   };

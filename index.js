@@ -26,6 +26,8 @@ const purchaseOrderRoutes = require("./routes/purchaseOrderRoutes");
 const purchaseOrderLineRoutes = require("./routes/purchaseOrderLineRoutes");
 const salesOrderRoutes = require("./routes/salesOrderRoutes");
 const salesOrderLineRoutes = require("./routes/salesOrderLineRoutes");
+const itemRoutes = require("./routes/itemRoutes");
+const taxRoutes = require("./routes/taxRoutes");
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/purchase-order-lines", purchaseOrderLineRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/sales-order-lines", salesOrderLineRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/taxes", taxRoutes);
 
 // Home Route
 app.get('/', (req, res) => {
@@ -68,16 +72,28 @@ app.get('/', (req, res) => {
 // Ensure we do not create multiple instances when running tests
 if (!module.parent) {
     const PORT = process.env.PORT || 5000;
-    sequelize.sync({ force: false })
-        .then(() => {
+
+    (async () => {
+        try {
+            console.log("⏳ Syncing database models in order...");
+
+            // Sync in order: PurchaseOrder before VendorBill
+            await sequelize.sync({ force: false }); // Standard sync
+            // If needed, sync models individually in correct order
+            await sequelize.models.PurchaseOrder.sync();
+            await sequelize.models.PurchaseOrderLine.sync();
+            await sequelize.models.VendorBill.sync();
+            await sequelize.models.VendorBillLine.sync();
+
             console.log("✅ Database connected and models are synced.");
+
             app.listen(PORT, () => {
                 console.log(`🚀 Server running on port ${PORT}`);
             });
-        })
-        .catch((err) => {
+        } catch (err) {
             console.error("❌ Database connection error:", err);
-        });
+        }
+    })();
 }
 
 module.exports = app; // ✅ Ensure the app is exportable for tests

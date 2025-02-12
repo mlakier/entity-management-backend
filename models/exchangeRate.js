@@ -44,16 +44,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // ✅ Define Associations
   ExchangeRate.associate = (models) => {
-    ExchangeRate.belongsTo(models.Currency, {
-      foreignKey: "base_currency",
-      as: "BaseCurrency",
-    });
-    ExchangeRate.belongsTo(models.Currency, {
-      foreignKey: "target_currency",
-      as: "TargetCurrency",
-    });
+    if (!ExchangeRate.associations) { // ✅ Ensure associations are defined only once
+      ExchangeRate.belongsTo(models.Currency, { foreignKey: "base_currency", as: "BaseCurrencyRef" });
+      ExchangeRate.belongsTo(models.Currency, { foreignKey: "target_currency", as: "TargetCurrencyRef" });
+    }
   };
 
   return ExchangeRate;

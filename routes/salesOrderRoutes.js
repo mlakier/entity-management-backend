@@ -9,19 +9,73 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-    const order = await SalesOrder.findByPk(req.params.id);
-    if (!order) return res.status(404).json({ error: "Purchase Order not found" });
-    res.json(order);
+    try {
+        const customerInvoice = await CustomerInvoice.findByPk(req.params.id, {
+            include: [
+                { model: Customer, attributes: ["customer_name"] },
+                { model: SalesOrder, attributes: ["so_number"] }, // ✅ Include SO number
+            ],
+        });
+
+        if (!customerInvoice) {
+            return res.status(404).json({ error: "Customer Invoice not found" });
+        }
+
+        res.json(customerInvoice);
+    } catch (error) {
+        console.error("🔥 Error fetching Customer Invoice:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 router.post("/", async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const newOrder = await SalesOrder.create(req.body);
-        res.status(201).json(newOrder);
+      const salesOrder = await SalesOrder.create(req.body, { transaction });
+  
+      // Fetch items from request
+      const soItems = req.body.items;
+  
+      for (const item of soItems) {
+        const itemData = await Item.findByPk(item.item_id);
+        if (!itemData) throw new Error("Invalid item.");
+  
+        if (itemData.drop_ship || itemData.special_order) {
+          const purchaseOrder = await PurchaseOrder.create(
+            {
+              vendor_id: itemData.vendor_id[0], // Selecting first vendor
+              entity_id: req.body.entity_id,
+              so_id: salesOrder.so_id,
+              po_date: new Date(),
+              total_amount: item.quantity * item.unit_price,
+              status: "Draft",
+              auto_created: true,
+              created_by: req.body.created_by,
+              updated_by: req.body.updated_by,
+            },
+            { transaction }
+          );
+  
+          await PurchaseOrderLine.create(
+            {
+              po_id: purchaseOrder.po_id,
+              item_id: item.item_id,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+            },
+            { transaction }
+          );
+        }
+      }
+  
+      await transaction.commit();
+      res.status(201).json(salesOrder);
     } catch (error) {
-        res.status(500).json({ error: "Error creating Purchase Order" });
+      await transaction.rollback();
+      console.error("🔥 Error creating Sales Order:", error);
+      res.status(500).json({ error: "Failed to create Sales Order." });
     }
-});
+  });
 
 router.put("/:id", async (req, res) => {
     try {

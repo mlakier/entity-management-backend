@@ -30,11 +30,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         created_by: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: true
         },
         updated_by: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: true
         },
         created_at: {

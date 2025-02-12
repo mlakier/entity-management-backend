@@ -50,6 +50,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+    }, {
+        tableName: "Vendors",
+        timestamps: true,
     });
   
     return Vendor;

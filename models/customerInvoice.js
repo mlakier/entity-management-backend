@@ -70,5 +70,12 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: true,
     });
 
+    CustomerInvoice.associate = (models) => {
+        CustomerInvoice.belongsTo(models.Customer, { foreignKey: "customer_id" });
+        CustomerInvoice.belongsTo(models.Entity, { foreignKey: "entity_id" });
+        CustomerInvoice.belongsTo(models.SalesOrder, { foreignKey: "sales_order_id" }); // ✅ Links to Sales Orders
+        CustomerInvoice.hasMany(models.CustomerInvoiceLine, { foreignKey: "invoice_id" });
+      };
+
     return CustomerInvoice;
 };

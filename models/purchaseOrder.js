@@ -8,13 +8,18 @@ module.exports = (sequelize, DataTypes) => {
         vendor_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: "Vendor", key: "vendor_id" }
+            references: { model: "Vendors", key: "vendor_id" }
         },
         entity_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: "Entity", key: "entity_id" }
+            references: { model: "Entities", key: "entity_id" }
         },
+        so_id: {
+            type: DataTypes.INTEGER,
+            references: { model: "Sales_Order", key: "so_id" },
+            comment: "Linked to Sales Order for drop ship or special orders",
+          },
         po_date: {
             type: DataTypes.DATEONLY,
             allowNull: false
@@ -30,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.ENUM("Draft", "Approved", "Received", "Closed"),
             defaultValue: "Draft"
         },
+        auto_created: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            comment: "True if created automatically for drop ship or special order items",
+          },
         created_by: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -43,11 +53,13 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: true
     });
 
-    PurchaseOrder.associate = (models) => {
-        PurchaseOrder.belongsTo(models.Vendor, { foreignKey: "vendor_id" });
-        PurchaseOrder.belongsTo(models.Entity, { foreignKey: "entity_id" });
-        PurchaseOrder.hasMany(models.PurchaseOrderLine, { foreignKey: "po_id" });
-    };
+  // ✅ Define Associations
+  PurchaseOrder.associate = (models) => {
+    PurchaseOrder.belongsTo(models.Vendor, { foreignKey: "vendor_id" });
+    PurchaseOrder.belongsTo(models.Entity, { foreignKey: "entity_id" });
+    PurchaseOrder.belongsTo(models.SalesOrder, { foreignKey: "so_id" });
+    PurchaseOrder.hasMany(models.PurchaseOrderLine, { foreignKey: "po_id", onDelete: "CASCADE" });
+  };
 
     return PurchaseOrder;
 };
